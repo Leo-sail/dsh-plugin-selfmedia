@@ -1,0 +1,10 @@
+# The dsh-plugin-selfmedia bundle patch: inserted as ONE layer over the profile
+# tree. The plugin registers its tools on `ctx.tools`, its skills provider on
+# `ctx.skills`, and its host-plane collection timer via `ctx.interval`.
+#
+# A user profile's own `cordis.patch.yml` and the home-level patch are applied
+# AFTER this layer, so any row below can be overridden or disabled by id.
+
+- insert:
+    - id: selfmedia
+      name: dsh-plugin-selfmedia
