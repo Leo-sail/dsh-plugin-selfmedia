@@ -8,7 +8,7 @@
 src/              插件源码（TypeScript）
   contracts.ts    工具名与技能名的单一事实源，全项目唯一
   status.ts       内容状态与评论状态枚举
-  storage.ts      $AEOTH_HOME/selfmedia 状态读写（用 node:fs，不用 ctx.fs）
+  storage.ts      $DSH_HOME/selfmedia 状态读写（用 node:fs，不用 ctx.fs）
   schedule.ts     定时规则：时区计算、触发判断（无 cron，纯函数）
   index.ts        插件入口：name/inject/apply/Config
   services/       AIHOT 客户端、日报服务（纯逻辑，不依赖 ctx）
@@ -40,7 +40,7 @@ docs/             说明文档
 - **工具只在 `src/tools/` 里注册**，service 层不接触 ctx
 - **contracts.ts 是唯一事实源**：新增工具名/技能名必须先加这里
 - **技能 SKILL.md 通过 `scripts/gen-skills.mjs` 生成**，不手动创建单个文件
-- **storage.ts 直接用 `node:fs/promises`**，ctx.fs 有沙箱约束，状态目录在 `$AEOTH_HOME` 下
+- **storage.ts 直接用 `node:fs/promises`**，ctx.fs 有沙箱约束，状态目录在 `$DSH_HOME` 下
 
 ### 命名规则
 
@@ -92,7 +92,7 @@ ctx.tools.register(defineTool({
 
 ### 5. peerDependencies 跟着实际运行时走
 
-- 本机 Aeoth 桌面应用的运行时是 `0.2.0-rc.2`（旧的 npx `dsh` CLI 才是 `0.1.2-rc.1`）
+- DSH 运行时版本需与 `peerDependencies` 保持一致
 - 兼容门禁**只**检查 `@deepseek-ai/dsh` / `@deepseek-ai/dsh-*` 前缀的 peer，`@deepseek-ai/cordis`、`schemastery` 不参与判断
 - 声明 `^0.1.2-rc.1` 会让 0.2 运行时拒绝安装；跨版本兼容时写多段范围，如
   `"^0.1.2-rc.1 || ^0.2.0-rc.1"`（`dshmarket` 就是这么写的）
@@ -108,11 +108,10 @@ ctx.tools.register(defineTool({
   preset 实例多起一个 host-plane 采集定时器
 - 全局层注册的技能在 preset 内可见，所以 76 个技能不需要在 preset 里再挂一次
 
-### 7. 状态目录必须落在 Aeoth home
+### 7. 状态目录遵循标准 DSH home 解析
 
-- `@deepseek-ai/dsh-home-paths` 的优先级：显式配置 → `$AEOTH_HOME` → 旧 `$DSH_HOME` → `~/.aeoth`
-- 桌面运行时宿主进程**不导出**这两个环境变量，只按 `DSH_HOME` 读并回退 `~/.dsh` 会把状态
-  写到已废弃的旧 home（Aeoth 的 home 是 `~/.aeoth`）
+- `@deepseek-ai/dsh-home-paths` 按标准优先级解析：显式配置 → `$DSH_HOME` → `~/.dsh`
+- 插件使用标准路径解析，无需特殊配置
 
 ## 验证流程
 
